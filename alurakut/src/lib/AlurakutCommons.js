@@ -21,6 +21,9 @@ function Link({ href, children, ...props }) {
 // ================================================================================================================
 export function AlurakutMenu({ githubUser }) {
   const [isMenuOpen, setMenuState] = React.useState(false);
+  // const [isDark, setDarkMode] = React.useState(false);
+  
+
   return (
     <AlurakutMenu.Wrapper isMenuOpen={isMenuOpen}>
       <div className="container">
@@ -35,6 +38,9 @@ export function AlurakutMenu({ githubUser }) {
         </nav>
 
         <nav>
+          {/* <div>
+            <input id="night-mode" class="lamp" type="checkbox" aria-label="night-mode" onClick={DarkMode} />
+          </div> */}
           <a href={`/logout`}>
             Sair
           </a>

@@ -1,13 +1,24 @@
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 
-import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
+import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations';
+import { useState } from 'react';
 
 function ProfileSideBar(props) {
   return(
-    <Box>
+    <Box as="aside">
       <img src={`https://github.com/${props.githubUser}.png`} alt="Minha foto" style={{ borderRadius: '8px' }} />
+      <hr/>
+
+      <p>
+        <a className="" href={`https://github.com/${props.githubUser}`}>
+          @{props.githubUser}
+        </a>
+      </p>
+      <hr/>
+      <AlurakutProfileSidebarMenuDefault />
+
     </Box>
 
   );
@@ -15,7 +26,13 @@ function ProfileSideBar(props) {
 }
 
 export default function Home() {
+  //React.useState();
   const githubUser = 'ptmarmello';
+  const [comunis, setComunis] = useState([{
+    id: new Date().toISOString(),
+    title:'Eu odeio acordar cedo',
+    image:'https://alurakut.vercel.app/capa-comunidade-01.jpg'
+  }]);
   const favsDevs = ['juunegreiros', 'omariosouto','peas','rafaballerini','marcobrunodev', 'felipefialho'];
   return (
     <>
@@ -28,18 +45,60 @@ export default function Home() {
           <Box>
             <h1 className="smallTitle">
               Bem Vindo(a), {githubUser}!
-              <OrkutNostalgicIconSet />
             </h1>
+              <OrkutNostalgicIconSet />
+          </Box>
+          <Box>
+            <h3>O que você deseja fazer?</h3>
+            <hr />
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+
+              const comunidade = {
+                id: new Date().toISOString(),
+                title: formData.get('title'),
+                image: formData.get('image')
+              };
+              setComunis([comunis, comunidade]);
+            } 
+            
+            } >
+              <div>
+                <input placeholder="Qual vai ser o nome da sua comunidade?" name="title" aria-label="Qual vai ser o nome da sua comunidade?" type="text" />
+              </div>
+              <div>
+                <input placeholder="Coloque uma URL para usar de capa" name="image" aria-label="Coloque uma URL para usar de capa" type="text"  />
+              </div>
+              <button type="submit">
+                Criar Comunidade
+              </button>
+            </form>
           </Box>
         </div>
 
         <div className="ProfileRelationsArea" style={{gridArea:'ProfileRelationsArea'}}>
           <ProfileRelationsBoxWrapper>
+          <h2 className="smallTitle"> Comunidades Dev ({comunis.length}) </h2>
+            <ul>
+              {comunis.map((itemAtual) => {
+                return(
+                  <li key={itemAtual.id} >
+                    <a href={`users/${itemAtual.title}`} key={itemAtual.title} >
+                      <img src={`${itemAtual.image}`}/>
+                      <span>{itemAtual.title}</span>
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </ProfileRelationsBoxWrapper>
+          <ProfileRelationsBoxWrapper>
             <h2 className="smallTitle"> Pessoas da Comunidade Dev ({favsDevs.length}) </h2>
             <ul>
               {favsDevs.map((devs) => {
                 return(
-                  <li>
+                  <li key={devs.indexOf()}>
                     <a href={`https://github.com/${devs}`} key={githubUser} >
                       <img src={`https://github.com/${devs}.png`}/>
                       <span>{devs}</span>
@@ -49,9 +108,6 @@ export default function Home() {
               })}
             </ul>
           </ProfileRelationsBoxWrapper>
-          <Box>
-            Depois eu Invento umas Comunidades
-          </Box>
         </div>
       </MainGrid>
     </>
