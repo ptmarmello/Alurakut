@@ -1,3 +1,4 @@
+import React from 'react';
 import MainGrid from '../src/components/MainGrid';
 import Box from '../src/components/Box';
 
@@ -25,6 +26,27 @@ function ProfileSideBar(props) {
 
 }
 
+function ProfileBox(props){
+  return(
+    <ProfileRelationsBoxWrapper>
+      <h2 className="smallTitle"> {props.title} ({props.items.length}) </h2>
+      <ul>
+        {props.items.map((itemAtual) => {
+          return(
+            <li key={itemAtual.id} >
+              <a href={`https://github.com/${itemAtual.login}`} >
+                <img src={`https://github.com/${itemAtual.login}.png`}/>
+                <span>@{itemAtual.login}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </ProfileRelationsBoxWrapper>
+  )
+}
+
+
 export default function Home() {
   //React.useState();
   const githubUser = 'ptmarmello';
@@ -34,6 +56,21 @@ export default function Home() {
     image:'https://alurakut.vercel.app/capa-comunidade-01.jpg'
   }]);
   const favsDevs = ['juunegreiros', 'omariosouto','peas','rafaballerini','marcobrunodev', 'felipefialho'];
+  const [seguidores, setSeguidores] = React.useState([]);
+  React.useEffect( () => {
+    fetch(`https://api.github.com/users/${githubUser}/followers`)
+      .then((response) => {
+        return response.json();
+      }).then((response) => {
+        console.log(response)
+        setSeguidores(response);
+      })
+  },[]);
+    
+
+
+
+
   return (
     <>
       <AlurakutMenu />
@@ -78,6 +115,7 @@ export default function Home() {
         </div>
 
         <div className="ProfileRelationsArea" style={{gridArea:'ProfileRelationsArea'}}>
+          <ProfileBox title="Seguidores" items={seguidores} />
           <ProfileRelationsBoxWrapper>
           <h2 className="smallTitle"> Comunidades Dev ({comunis.length}) </h2>
             <ul>
@@ -101,7 +139,7 @@ export default function Home() {
                   <li key={devs.indexOf()}>
                     <a href={`https://github.com/${devs}`} key={githubUser} >
                       <img src={`https://github.com/${devs}.png`}/>
-                      <span>{devs}</span>
+                      <span>@{devs}</span>
                     </a>
                   </li>
                 )
