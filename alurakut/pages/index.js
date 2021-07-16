@@ -50,13 +50,12 @@ function ProfileBox(props){
 export default function Home() {
   //React.useState();
   const githubUser = 'ptmarmello';
-  const [comunis, setComunis] = useState([{
-    id: new Date().toISOString(),
-    title:'Eu odeio acordar cedo',
-    image:'https://alurakut.vercel.app/capa-comunidade-01.jpg'
-  }]);
+  const [comunis, setComunis] = useState([]);
+  
   const favsDevs = ['juunegreiros', 'omariosouto','peas','rafaballerini','marcobrunodev', 'felipefialho'];
+  
   const [seguidores, setSeguidores] = React.useState([]);
+
   React.useEffect( () => {
     fetch(`https://api.github.com/users/${githubUser}/followers`)
       .then((response) => {
@@ -65,6 +64,33 @@ export default function Home() {
         console.log(response)
         setSeguidores(response);
       })
+    
+
+      // API GraphQL -> DATO CMS
+    fetch('https://graphql.datocms.com/',{
+      method: 'POST',
+      headers:{
+        'Authorization':'8a14980d91c1565ae5773291728bcd',
+        'Content-Type':'application/json',
+        'Accept': 'application/json',
+      },
+      body : JSON.stringify({"query":`query {
+        allCommunities {
+          id
+          title
+          creatorSlug
+          imageUrl
+        }
+      }` })
+    })
+    .then((response) => response.json())
+    .then((response) => {
+      const comunidadesCompletas = response.data.allCommunities;
+      setComunis = comunidadesCompletas;
+      console.log(comunidadesCompletas);
+    })
+
+
   },[]);
     
 
@@ -91,13 +117,28 @@ export default function Home() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.target);
-
+              
               const comunidade = {
-                id: new Date().toISOString(),
+                // id: new Date().toISOString(),
                 title: formData.get('title'),
-                image: formData.get('image')
+                // image: formData.get('image'),
+                imageUrl: formData.get('image'),
+                creatorSlug: githubUser
               };
-              setComunis([comunis, comunidade]);
+              
+              fetch('./api/comunidades',{
+                method: 'POST',
+                headers:{
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(comunidade)
+              }).then(async (response) => {
+                const dads = await response.json();
+                console.log(dads);
+                const comunidade = dads.registroCriado;
+                setComunis([...comunis, comunidade]);
+              })
+              
             } 
             
             } >
@@ -122,8 +163,8 @@ export default function Home() {
               {comunis.map((itemAtual) => {
                 return(
                   <li key={itemAtual.id} >
-                    <a href={`users/${itemAtual.title}`} key={itemAtual.title} >
-                      <img src={`${itemAtual.image}`}/>
+                    <a href={`communities/${itemAtual.title}`} key={itemAtual.title} >
+                      <img src={`${itemAtual.imageUrl}`}/>
                       <span>{itemAtual.title}</span>
                     </a>
                   </li>
